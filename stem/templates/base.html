@@ -12,7 +12,14 @@
     >
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
   </head>
-  <body class="bg-light">
+  <body class="theme-ocean">
+    <!-- Theme Switcher Navigation Bar -->
+    <div class="theme-bar" style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+        <button class="theme-pill" onclick="setTheme('theme-ocean')">🌊 Ethereal Ocean</button>
+        <button class="theme-pill" onclick="setTheme('theme-pink')">🎀 Bubble Pink</button>
+        <button class="theme-pill" onclick="setTheme('theme-spongebob')">🍍 Bikini Bottom</button>
+        <button class="theme-pill" onclick="setTheme('theme-circuit')">⚡ Cyber Circuit</button>
+    </div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
       <div class="container">
         <a class="navbar-brand fw-semibold" href="{{ url_for('dashboard.home') }}">S.T.E.M.</a>
@@ -72,4 +79,14 @@
       crossorigin="anonymous"
     ></script>
   </body>
+  <script>
+    function setTheme(themeName) {
+        document.body.className = themeName;
+        localStorage.setItem('stem_theme', themeName);
+    }
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('stem_theme') || 'theme-ocean';
+        document.body.className = savedTheme;
+    }
+</script>
 </html>
