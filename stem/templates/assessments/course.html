@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_code }} Assessments · S.T.E.M.{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h1 class="h4 mb-0">{{ course.course_code }} — {{ course.course_name }}</h1>
+        <p class="text-muted mb-0">Assessments and course performance</p>
+      </div>
+      <a href="{{ url_for('assessments.new') }}" class="btn btn-primary">Add assessment</a>
+    </div>
+  </div>
+</div>
+
+{% if assessments %}
+<div class="card shadow-sm mt-4">
+  <div class="card-body p-4">
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th style="width: 14%;">Type</th>
+            <th style="width: 16%;">Date</th>
+            <th style="width: 12%;">Max marks</th>
+            <th style="width: 12%;">Marks</th>
+            <th style="width: 10%;">%</th>
+            <th style="width: 18%;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for assessment in assessments %}
+          <tr>
+            <td><strong>{{ assessment.title }}</strong></td>
+            <td><span class="badge badge-type">{{ assessment.assessment_type.title() }}</span></td>
+            <td class="text-muted small">
+              {{ assessment.assessment_date.strftime('%d %b %Y, %I:%M %p') if assessment.assessment_date else '' }}
+            </td>
+            <td>{{ assessment.max_marks }}</td>
+            <td>
+              {% if assessment.grade %}
+                <strong>{{ assessment.grade.marks_obtained }}</strong>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if assessment.grade %}
+                <span class="badge bg-info">{{ "%.2f"|format(assessment.grade.percentage) }}%</span>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="{{ url_for('assessments.edit', assessment_id=assessment.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <form method="post" action="{{ url_for('assessments.delete', assessment_id=assessment.id) }}" class="d-inline" onsubmit="return confirm('Delete this assessment?')">
+                  {{ csrf_token() }}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+                <form method="post" action="{{ url_for('assessments.grade', assessment_id=assessment.id) }}" class="d-inline flex-fill">
+                  <div class="input-group input-group-sm">
+                    <input name="marks_obtained" class="form-control" placeholder="Marks" step="0.01" min="0" required>
+                    <button type="submit" class="btn btn-success">Save</button>
+                  </div>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="h6 mt-4 mb-2">Course performance</h3>
+    {% set graded = assessments|selectattr("grade")|list %}
+    {% if graded %}
+      {% set total_pct = 0 %}
+      {% for a in graded %}
+        {% set _ = total_pct.__iadd__(a.grade.percentage) %}
+      {% endfor %}
+      {% set avg = total_pct / graded|length %}
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card text-center bg-light border">
+            <div class="card-body">
+              <div class="h5 text-muted">Graded assessments</div>
+              <div class="h2">{{ graded|length }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center bg-light border">
+            <div class="card-body">
+              <div class="h5 text-muted">Average percentage</div>
+              <div class="h2 text-primary">{{ "%.2f"|format(avg) }}%</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center bg-light border">
+            <div class="card-body">
+              <div class="h5 text-muted">Ungraded assessments</div>
+              <div class="h2">{{ (assessments|length - graded|length) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="text-muted small mt-3">
+        Overall course performance is based only on assessments with recorded marks. Ungraded
+        assessments are not treated as zero.
+      </p>
+    {% else %}
+      <div class="alert alert-info">
+        No grades recorded yet. Record marks for an assessment to see course performance.
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info mt-4">
+  No assessments for this course yet.
+  <a href="{{ url_for('assessments.new') }}" class="alert-link">Add one</a>.
+</div>
+{% endif %}
+{% endblock %}

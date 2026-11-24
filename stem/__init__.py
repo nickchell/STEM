@@ -41,9 +41,13 @@ def create_app(config_class=None):
     # Import models so Flask-Migrate sees them on metadata.
     from stem import models  # noqa: F401
     from stem.blueprints.auth import auth_bp
+    from stem.blueprints.assessments import assessments_bp
+    from stem.blueprints.courses import courses_bp
     from stem.blueprints.dashboard import dashboard_bp
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(assessments_bp)
+    app.register_blueprint(courses_bp)
     app.register_blueprint(dashboard_bp)
 
     return app

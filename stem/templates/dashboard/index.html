@@ -5,10 +5,84 @@
   <div class="card-body p-4">
     <h1 class="h3">Student dashboard</h1>
     <p class="lead mb-2">Hello, {{ current_user.email }}.</p>
-    <p class="text-muted mb-0">
-      This is your private workspace. Course management, assessments, tasks,
-      and analytics will appear here in later slices.
+  </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+  <div class="card-body p-4">
+    <h2 class="h5 mb-3">Your courses</h2>
+    <p class="mb-1">
+      <strong>Total Courses: {{ course_count }}</strong>
     </p>
+    {% if recent_courses %}
+      <h3 class="h6 mb-2">Recent activity</h3>
+      <ul class="list-unstyled mb-0">
+        {% for course in recent_courses %}
+          <li class="mb-2 d-flex justify-content-between align-items-start">
+            <span>Added {{ course.course_code }} — {{ course.course_name }}</span>
+            <span class="text-muted small">
+              {{ course.created_at.strftime('%d %b %Y, %I:%M %p') if course.created_at else '' }}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted mb-0">No activity yet. Add your first course on the <a href="{{ url_for('courses.index') }}">Courses</a> page.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+  <div class="card-body p-4">
+    <h2 class="h5 mb-3">Assessments</h2>
+    <p class="mb-1">
+      <strong>Total Assessments: {{ total_assessments }}</strong>
+    </p>
+
+    {% if overall_performance is not none %}
+      <div class="mb-3">
+        <strong>Overall academic performance:</strong>
+        <span class="badge bg-info fs-6">{{ "%.2f"|format(overall_performance) }}%</span>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Record some grades to see your overall academic performance.</p>
+    {% endif %}
+
+    {% if upcoming_assessments %}
+      <h3 class="h6 mb-2">Upcoming assessments</h3>
+      <ul class="list-unstyled mb-0">
+        {% for assessment in upcoming_assessments %}
+          <li class="mb-2 d-flex justify-content-between align-items-start">
+            <span>
+              <strong>{{ assessment.title }}</strong> ({{ assessment.assessment_type.title() }}) —
+              {{ assessment.course.course_code }}
+            </span>
+            <span class="text-muted small">
+              {{ assessment.assessment_date.strftime('%d %b %Y, %I:%M %p') if assessment.assessment_date else '' }}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted mb-0">No upcoming assessments.</p>
+    {% endif %}
+
+    {% if recent_grades %}
+      <h3 class="h6 mb-2 mt-4">Recent grades</h3>
+      <ul class="list-unstyled mb-0">
+        {% for grade in recent_grades %}
+          <li class="mb-2 d-flex justify-content-between align-items-start">
+            <span>
+              <strong>{{ grade.assessment.title }}</strong> — {{ grade.assessment.course.course_code }}
+            </span>
+            <span class="text-muted small">
+              {{ grade.marks_obtained }} / {{ grade.assessment.max_marks }}
+              ({{ "%.2f"|format(grade.percentage) }}%)
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

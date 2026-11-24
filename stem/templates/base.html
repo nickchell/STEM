@@ -35,6 +35,20 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="main-nav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint and request.endpoint.startswith('dashboard') %}active{% endif %}"
+                 href="{{ url_for('dashboard.index') }}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint and request.endpoint.startswith('courses') %}active{% endif %}"
+                 href="{{ url_for('courses.index') }}">Courses</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint and request.endpoint.startswith('assessments') %}active{% endif %}"
+                 href="{{ url_for('assessments.index') }}">Assessments</a>
+            </li>
+          </ul>
           <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
             {% if current_user.is_authenticated %}
               <li class="nav-item">
